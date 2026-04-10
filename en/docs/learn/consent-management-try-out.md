@@ -256,7 +256,7 @@ https://<IS_HOSTNAME>:9446/api/fs/consent/manage/account-access-consents/<CONSEN
 --cert <TRANSPORT_PUBLIC_KEY_FILE_PATH> --key <TRANSPORT_PRIVATE_KEY_FILE_PATH> \
 --data '{
     "consentID": "328524c0-b4a3-457e-a145-e79d92c4654e",
-    "status": "AwaitingAuthorisation",
+    "status": "Authorised",
     "validityPeriod": 1774080967,
     "recurringIndicator": true,
     "consentFrequency": 0,
@@ -315,9 +315,130 @@ https://<IS_HOSTNAME>:9446/api/fs/consent/manage/account-access-consents/<CONSEN
         }
     ],
     "consentFrequency": 0,
-    "status": "AwaitingAuthorisation"
+    "status": "Authorised"
 }  
 ```
+
+The consent update endpoint can be used to partially update the existing consent. 
+
+Scenario 1: Update the status of the consent
+
+A sample consent update request looks as follows:
+
+``` bash
+curl -X PUT \
+https://<IS_HOSTNAME>:9446/api/fs/consent/manage/account-access-consents/<CONSENT_ID> \
+-H 'Authorization: Basic <AUTH_HEADER_VALUE>' \
+-H 'x-wso2-client-id: <CLIENT_ID>' \
+-H 'x-wso2-internal-request: true' \
+-H 'x-fapi-interaction-id: <INTERACTION_ID>' \
+-H 'Content-Type: application/json' \
+--cert <TRANSPORT_PUBLIC_KEY_FILE_PATH> --key <TRANSPORT_PRIVATE_KEY_FILE_PATH> \
+--data '{
+    "consentID": "328524c0-b4a3-457e-a145-e79d92c4654e",
+    "status": "Authorised"
+}'
+```
+  
+- A sample response looks as follows:
+
+``` json
+{
+    "validityPeriod": 1774080967,
+    "consentAttributes": {
+        "key1": "value1",
+        "key2": "value2"
+    },
+    "updatedTime": 1773648968,
+    "consentID": "328524c0-b4a3-457e-a145-e79d92c4654e",
+    "clientID": "7bw8O8_7_E7s2Y6reXupdwXqGm4a",
+    "consentType": "accounts",
+    "createdTime": 1773648968,
+    "recurringIndicator": true,
+    "receipt": "{\"Data\": {\"Permissions\": [\"ReadAccountsBasic\", \"ReadAccountsDetail\", \"ReadBalances\"], \"ExpirationDateTime\": \"2026-03-17T15:43:35.946770+05:30\", \"TransactionToDateTime\": \"2026-03-15T15:43:35.947514+05:30\", \"TransactionFromDateTime\": \"2026-03-12T15:43:35.947399+05:30\"}, \"Risk\": {}}",
+    "authorizationResources": [
+        {
+            "authorizationID": "f562ce1f-7afc-4b6f-ac9d-2c3b1b5633d3",
+            "authorizationType": "auth",
+            "resources": [
+                {
+                    "mappingStatus": "active",
+                    "mappingID": "eeb76808-ce1c-4cdb-b161-b5b370c5827e",
+                    "accountID": "1962368",
+                    "permission": "account"
+                }
+            ],
+            "authorizationStatus": "Created",
+            "userID": "admin@wso2.com"
+        }
+    ],
+    "consentFrequency": 0,
+    "status": "Authorised"
+}  
+```
+
+Scenario 2: Update the validity period of the consent
+
+A sample consent update request looks as follows:
+
+``` bash
+curl -X PUT \
+https://<IS_HOSTNAME>:9446/api/fs/consent/manage/account-access-consents/<CONSENT_ID> \
+-H 'Authorization: Basic <AUTH_HEADER_VALUE>' \
+-H 'x-wso2-client-id: <CLIENT_ID>' \
+-H 'x-wso2-internal-request: true' \
+-H 'x-fapi-interaction-id: <INTERACTION_ID>' \
+-H 'Content-Type: application/json' \
+--cert <TRANSPORT_PUBLIC_KEY_FILE_PATH> --key <TRANSPORT_PRIVATE_KEY_FILE_PATH> \
+--data '{
+    "consentID": "328524c0-b4a3-457e-a145-e79d92c4654e",
+    "validityPeriod": 1774080967
+}'
+```
+  
+- A sample response looks as follows:
+
+``` json
+{
+    "validityPeriod": 1774080967,
+    "consentAttributes": {
+        "key1": "value1",
+        "key2": "value2"
+    },
+    "updatedTime": 1773648968,
+    "consentID": "328524c0-b4a3-457e-a145-e79d92c4654e",
+    "clientID": "7bw8O8_7_E7s2Y6reXupdwXqGm4a",
+    "consentType": "accounts",
+    "createdTime": 1773648968,
+    "recurringIndicator": true,
+    "receipt": "{\"Data\": {\"Permissions\": [\"ReadAccountsBasic\", \"ReadAccountsDetail\", \"ReadBalances\"], \"ExpirationDateTime\": \"2026-03-17T15:43:35.946770+05:30\", \"TransactionToDateTime\": \"2026-03-15T15:43:35.947514+05:30\", \"TransactionFromDateTime\": \"2026-03-12T15:43:35.947399+05:30\"}, \"Risk\": {}}",
+    "authorizationResources": [
+        {
+            "authorizationID": "f562ce1f-7afc-4b6f-ac9d-2c3b1b5633d3",
+            "authorizationType": "auth",
+            "resources": [
+                {
+                    "mappingStatus": "active",
+                    "mappingID": "eeb76808-ce1c-4cdb-b161-b5b370c5827e",
+                    "accountID": "1962368",
+                    "permission": "account"
+                }
+            ],
+            "authorizationStatus": "Created",
+            "userID": "admin@wso2.com"
+        }
+    ],
+    "consentFrequency": 0,
+    "status": "Authorised"
+}  
+```
+
+!!! note
+    - Consent update request does not consider not available or null values. As an example, if the `frequency` field is not available in the update payload or `frequency` field is null, we don't update the value. 
+    - For `consentAttributes` and `authorizationResources`, if those are not empty, system will delete the existing data and store the data sent in the upload request payload.
+    - For `consentAttributes` and `authorizationResources`, if those are empty, system will delete the existing data.
+    - For `consentAttributes` and `authorizationResources`, if the field is not available or null, the value will not be updated. 
+
 
 ### Delete a consent
 
